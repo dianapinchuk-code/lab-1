@@ -1,24 +1,28 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.Queries;
+using Application.Common.Interfaces.Repositories;
 using Domain.Rooms;
+using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class RoomRepository(ApplicationDbContext context) : IRoomRepository
+public class RoomRepository(ApplicationDbContext context) : IRoomRepository, IRoomQueries
 {
     public async Task<IReadOnlyList<HotelRoom>> GetAll(CancellationToken cancellationToken)
     {
         return await context.Rooms.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<HotelRoom?> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<Option<HotelRoom>> GetById(RoomId id, CancellationToken cancellationToken)
     {
-        return await context.Rooms.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var entity = await context.Rooms.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return entity ?? Option<HotelRoom>.None;
     }
 
-    public async Task<HotelRoom?> GetByRoomNumber(string roomNumber, CancellationToken cancellationToken)
+    public async Task<Option<HotelRoom>> GetByRoomNumber(string roomNumber, CancellationToken cancellationToken)
     {
-        return await context.Rooms.FirstOrDefaultAsync(x => x.RoomNumber == roomNumber, cancellationToken);
+        var entity = await context.Rooms.FirstOrDefaultAsync(x => x.RoomNumber == roomNumber, cancellationToken);
+        return entity ?? Option<HotelRoom>.None;
     }
 
     public async Task<HotelRoom> Add(HotelRoom room, CancellationToken cancellationToken)

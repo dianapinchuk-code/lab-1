@@ -1,4 +1,5 @@
-using Application.Common.Interfaces;
+using Application.Common.Interfaces.Queries;
+using Application.Common.Interfaces.Repositories;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -36,7 +37,13 @@ public static class ConfigurePersistenceServices
     private static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<RoomRepository>();
+        
+        // Реєструємо репозиторій для запису
         services.AddScoped<IRoomRepository>(provider =>
+            provider.GetRequiredService<RoomRepository>());
+
+        // Реєструємо інтерфейс для читання (Queries)
+        services.AddScoped<IRoomQueries>(provider =>
             provider.GetRequiredService<RoomRepository>());
     }
 }

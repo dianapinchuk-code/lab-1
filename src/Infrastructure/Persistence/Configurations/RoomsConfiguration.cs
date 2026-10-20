@@ -11,7 +11,10 @@ public class RoomsConfiguration : IEntityTypeConfiguration<HotelRoom>
     {
         builder.HasKey(x => x.Id);
 
-        // Унікальний номер кімнати
+        // Конвертер для збереження RoomId у звичайну колонку uuid
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, x => new RoomId(x));
+
         builder.Property(x => x.RoomNumber)
             .HasColumnType("varchar(50)")
             .IsRequired();
